@@ -14,6 +14,8 @@ import retrofit.Response;
 import retrofit.Retrofit;
 import retrofit.http.GET;
 import retrofit.http.Path;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         Call<ArrayList<Repo>> repos = service.listRepos("octocat");
 
+//        base example
         repos.enqueue(new retrofit.Callback<ArrayList<Repo>>() {
             @Override
             public void onResponse(Response<ArrayList<Repo>> response, Retrofit retrofit) {
@@ -47,6 +50,12 @@ public class MainActivity extends AppCompatActivity {
                 Timber.e(t.getMessage());
             }
         });
+
+//        rx example
+        service.listReposRx("c-mars")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .forEach(list -> Timber.d(list.toString()));
     }
 
     public static class Repo {
@@ -56,5 +65,9 @@ public class MainActivity extends AppCompatActivity {
     public interface GitHubService {
         @GET("/users/{user}/repos")
         Call<ArrayList<Repo>> listRepos(@Path("user") String user);
+
+//        the same with rx
+        @GET("/users/{user}/repos")
+        rx.Observable<ArrayList<Repo>> listReposRx(@Path("user") String user);
     }
 }
