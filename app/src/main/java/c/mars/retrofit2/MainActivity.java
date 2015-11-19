@@ -30,15 +30,15 @@ public class MainActivity extends AppCompatActivity {
         Timber.plant(new Timber.DebugTree());
         ButterKnife.bind(this);
 
-//      remembering subsription is necessary to unsubscribe when activity is destroyed
+//      remembering subsription is necessary to unsubscribe when activity is stopped
         subscription = ApiHelper.getInstance().listRepos("c-mars", displayAction, saveAction, errorAction);
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onStop() {
         if (!subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
-        super.onDestroy();
+        super.onStop();
     }
 }
