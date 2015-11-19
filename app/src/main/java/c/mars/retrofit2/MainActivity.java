@@ -1,5 +1,6 @@
 package c.mars.retrofit2;
 
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -64,9 +65,12 @@ public class MainActivity extends AppCompatActivity {
 //        rx example
         service.listReposRx("c-mars")
                 .flatMap(list -> Observable.from(list))
+                .doOnNext(repo1 -> PreferenceManager.getDefaultSharedPreferences(this).edit().putString("repo", repo1.full_name).commit())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(repo -> textView.append(repo.full_name + "\n"), throwable -> textView.setText(throwable.getMessage()));
+                .subscribe(
+                        repo -> textView.append(repo.full_name + "\n"),
+                        throwable -> textView.setText(throwable.getMessage()));
     }
 
     public static class Repo {
